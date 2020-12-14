@@ -1,16 +1,26 @@
 def define_truth_table(number_of_variables):
     if number_of_variables == 3:
-        return [[0, 0, 0, 0], [0, 0, 1, 0], [0, 1, 0, 0], [0, 1, 1, 0], [1, 0, 0, 0], [1, 0, 1, 0], [1, 1, 0, 0],
-                [1, 1, 1, 0]]
+        return [[0, 0, 0, 0], [0, 0, 1, 0], [0, 1, 0, 0], [0, 1, 1, 0],
+                [1, 0, 0, 0], [1, 0, 1, 0], [1, 1, 0, 0], [1, 1, 1, 0]]
     elif number_of_variables == 4:
-        return [[0, 0, 0, 0, 0], [0, 0, 0, 1, 0], [0, 0, 1, 0, 0], [0, 0, 1, 1, 0], [0, 1, 0, 0, 0],
-                [0, 1, 0, 1, 0], [0, 1, 1, 0, 0],
-                [0, 1, 1, 1, 0], [1, 0, 0, 0, 0],
-                [1, 0, 0, 1, 0], [1, 0, 1, 0, 0], [1, 0, 1, 1, 0], [1, 1, 0, 0, 0], [1, 1, 0, 1, 0],
-                [1, 1, 1, 0, 0], [1, 1, 1, 1, 0]]
+        return [[0, 0, 0, 0, 0], [0, 0, 0, 1, 0], [0, 0, 1, 0, 0], [0, 0, 1, 1, 0],
+                [0, 1, 0, 0, 0], [0, 1, 0, 1, 0], [0, 1, 1, 0, 0], [0, 1, 1, 1, 0],
+                [1, 0, 0, 0, 0], [1, 0, 0, 1, 0], [1, 0, 1, 0, 0], [1, 0, 1, 1, 0],
+                [1, 1, 0, 0, 0], [1, 1, 0, 1, 0], [1, 1, 1, 0, 0], [1, 1, 1, 1, 0]]
     else:
         print("Syntax Error")
         return False
+
+
+def define_karnaugh_map(number_of_variables):
+    if number_of_variables == 3:
+        return [[0, 0, 0], [0, 0, 1], [0, 1, 1], [0, 1, 0],
+                [1, 0, 0], [1, 0, 1], [1, 1, 1], [1, 1, 0]]
+    elif number_of_variables == 4:
+        return [[0, 0, 0, 0], [0, 0, 0, 1], [0, 0, 1, 1], [0, 0, 1, 0],
+                [0, 1, 0, 0], [0, 1, 0, 1], [0, 1, 1, 1], [0, 1, 1, 0],
+                [1, 1, 0, 0], [1, 1, 0, 1], [1, 1, 1, 1], [1, 1, 1, 0],
+                [1, 0, 0, 0], [1, 0, 0, 1], [1, 0, 1, 1], [1, 0, 1, 0]]
 
 
 def validate_string(string_to_validate):
@@ -106,6 +116,7 @@ def write_truth_table_in_file():
                     truth_table[index][2]) + " " +
                 str(truth_table[index][3]) + " " + str(truth_table[index][4]) + "\n")
     fnc()
+    fnd()
     f.close()
 
 
@@ -160,6 +171,68 @@ def fnc():
                     print("!C v ", end='')
                     condition = 1
                 if line[3] == 0:
+                    print("D)", end='')
+                    condition = 1
+                else:
+                    print("!D)", end='')
+                    condition = 1
+
+    if condition == 0:
+        print("1")
+    print("\n")
+
+
+def fnd():
+    condition = 0
+    print("FND: ", end='')
+    for line in truth_table:
+
+        if number_of_variables == 3:
+            if line[3] == 1:
+                if condition != 0:
+                    print(" v ", end='')
+                if line[0] == 1:
+                    print("(A ∧ ", end='')
+                    condition = 1
+                else:
+                    print("(!A ∧ ", end='')
+                    condition = 1
+                if line[1] == 1:
+                    print("B ∧ ", end='')
+                    condition = 1
+                else:
+                    print("!B ∧ ", end='')
+                    condition = 1
+                if line[2] == 1:
+                    print("C)", end='')
+                    condition = 1
+                else:
+                    print("!C)", end='')
+                    condition = 1
+
+        if number_of_variables == 4:
+            if line[4] == 1:
+                if condition != 0:
+                    print(" v ", end='')
+                if line[0] == 1:
+                    print("(A ∧ ", end='')
+                    condition = 1
+                else:
+                    print("(!A ∧ ", end='')
+                    condition = 1
+                if line[1] == 1:
+                    print("B ∧ ", end='')
+                    condition = 1
+                else:
+                    print("!B ∧ ", end='')
+                    condition = 1
+                if line[2] == 1:
+                    print("C ∧ ", end='')
+                    condition = 1
+                else:
+                    print("!C ∧ ", end='')
+                    condition = 1
+                if line[3] == 1:
                     print("D)", end='')
                     condition = 1
                 else:
