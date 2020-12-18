@@ -15,6 +15,8 @@ def define_truth_table(number_of_variables):
 def define_karnaugh_map(number_of_variables):
     if number_of_variables == 3:
         return [[[0, 0, 0, 0], [0, 0, 1, 0], [0, 1, 1, 0], [0, 1, 0, 0]],
+                [[1, 0, 0, 0], [1, 0, 1, 0], [1, 1, 1, 0], [1, 1, 0, 0]],
+                [[0, 0, 0, 0], [0, 0, 1, 0], [0, 1, 1, 0], [0, 1, 0, 0]],
                 [[1, 0, 0, 0], [1, 0, 1, 0], [1, 1, 1, 0], [1, 1, 0, 0]]]
     elif number_of_variables == 4:
         return [[[0, 0, 0, 0, 0], [0, 0, 0, 1, 0], [0, 0, 1, 1, 0], [0, 0, 1, 0, 0]],
@@ -135,22 +137,17 @@ def fnc(truth_table, number_of_variables):
                     print(" ∧ ", end='')
                 if line[0] == 0:
                     print("(A v ", end='')
-                    condition = 1
                 else:
                     print("(!A v ", end='')
-                    condition = 1
                 if line[1] == 0:
                     print("B v ", end='')
-                    condition = 1
                 else:
                     print("!B v ", end='')
-                    condition = 1
                 if line[2] == 0:
                     print("C)", end='')
-                    condition = 1
                 else:
                     print("!C)", end='')
-                    condition = 1
+                condition = 1
 
         if number_of_variables == 4:
             if line[4] == 0:
@@ -158,28 +155,21 @@ def fnc(truth_table, number_of_variables):
                     print(" ∧ ", end='')
                 if line[0] == 0:
                     print("(A v ", end='')
-                    condition = 1
                 else:
                     print("(!A v ", end='')
-                    condition = 1
                 if line[1] == 0:
                     print("B v ", end='')
-                    condition = 1
                 else:
                     print("!B v ", end='')
-                    condition = 1
                 if line[2] == 0:
                     print("C v ", end='')
-                    condition = 1
                 else:
                     print("!C v ", end='')
-                    condition = 1
                 if line[3] == 0:
                     print("D)", end='')
-                    condition = 1
                 else:
                     print("!D)", end='')
-                    condition = 1
+                condition = 1
 
     if condition == 0:
         print("1")
@@ -197,22 +187,17 @@ def fnd(truth_table, number_of_variables):
                     print(" v ", end='')
                 if line[0] == 1:
                     print("(A ∧ ", end='')
-                    condition = 1
                 else:
                     print("(!A ∧ ", end='')
-                    condition = 1
                 if line[1] == 1:
                     print("B ∧ ", end='')
-                    condition = 1
                 else:
                     print("!B ∧ ", end='')
-                    condition = 1
                 if line[2] == 1:
                     print("C)", end='')
-                    condition = 1
                 else:
                     print("!C)", end='')
-                    condition = 1
+                condition = 1
 
         if number_of_variables == 4:
             if line[4] == 1:
@@ -220,31 +205,24 @@ def fnd(truth_table, number_of_variables):
                     print(" v ", end='')
                 if line[0] == 1:
                     print("(A ∧ ", end='')
-                    condition = 1
                 else:
                     print("(!A ∧ ", end='')
-                    condition = 1
                 if line[1] == 1:
                     print("B ∧ ", end='')
-                    condition = 1
                 else:
                     print("!B ∧ ", end='')
-                    condition = 1
                 if line[2] == 1:
                     print("C ∧ ", end='')
-                    condition = 1
                 else:
                     print("!C ∧ ", end='')
-                    condition = 1
                 if line[3] == 1:
                     print("D)", end='')
-                    condition = 1
                 else:
                     print("!D)", end='')
-                    condition = 1
+                condition = 1
 
     if condition == 0:
-        print("1")
+        print("0")
     print("\n")
 
 
@@ -257,14 +235,14 @@ def modify_karnaugh_map(truth_table, k_map, number_of_variables):
                 if number_of_variables == 3:
                     if compare_lists(map_item[0:3], table_item[0:3]):
                         map_item[3] = table_item[3]
-                        if table_item[3]:
+                        if table_item[3] and index_row < 2:
                             queue.append([index_row, index_column])
                 elif number_of_variables == 4:
                     if compare_lists(map_item[0:4], table_item[0:4]):
                         map_item[4] = table_item[4]
                         if table_item[4]:
                             queue.append([index_row, index_column])
-    print_karnaugh_map(k_map, number_of_variables)
+    # print_karnaugh_map(k_map, number_of_variables)
     karnaugh_minimization(k_map, number_of_variables, queue)
 
 
@@ -287,33 +265,36 @@ def print_karnaugh_map(k_map, number_of_variables):
 
 
 def karnaugh_minimization(k_map, number_of_variables, queue):
-    verified = []
+    if karnaugh_minimization_for_max(k_map, number_of_variables):
+        print("K-minimization: ", 1)
+        return
     if number_of_variables == 4:
-        if karnaugh_minimization_for_16(k_map):
-            print("K-minimization: ", 1)
-            return
-    maximum_size = 8
+        maximum_size = 8
+        verified = []
+    else:
+        maximum_size = 4
+        verified = [[2, 0], [2, 1], [2, 2], [2, 3],
+                    [3, 0], [3, 1], [3, 2], [3, 3]]
     # while maximum_size:
     print(queue)
     # In queue avem pozitiile din matrice etichetate cu 1 sau *
-    while (maximum_size):
-        directional_array = change_directional_array(maximum_size)
+    while maximum_size:
+        directional_array = change_directional_array(maximum_size, number_of_variables)
         for item in queue:
             for template in directional_array:
                 condition_zero = 1
                 condition_visited = 0
                 for direction in template:
                     # verificam daca sunt doar valori de 1 sau * in KMap
-                    if k_map[(item[0] + direction[0]) % 4][(item[1] + direction[1]) % 4][4] == 0:
+                    if k_map[(item[0] + direction[0]) % 4][(item[1] + direction[1]) % 4][number_of_variables] == 0:
                         condition_zero = 0
-                    else:
+                    elif k_map[(item[0] + direction[0]) % 4][(item[1] + direction[1]) % 4][number_of_variables] == 1:
                         # In cazul in care gasim un nod nevizitat
-                        if find_list_in_list([(item[0] + direction[0]) % 4, (item[1] + direction[1]) % 4],
-                                             verified) == 0:
+                        if find_list_in_list([(item[0] + direction[0]) % 4,(item[1] + direction[1]) % 4],verified) == 0:
                             condition_visited = 1
                 if condition_zero and condition_visited:
-                    minimization_result(k_map, item, template)
-                    for aux in add_to_verified(item, template):
+                    minimization_result(k_map, item, template, number_of_variables)
+                    for aux in add_to_verified(item, template, number_of_variables):
                         verified.append(aux)
                     print("Verified: ", verified)
         if maximum_size == 1:
@@ -321,7 +302,7 @@ def karnaugh_minimization(k_map, number_of_variables, queue):
         maximum_size /= 2;
 
 
-def minimization_result(k_map, item, template):
+def minimization_result(k_map, item, template, number_of_variables):
     index = 0
     result = []
     condition = 0
@@ -330,10 +311,13 @@ def minimization_result(k_map, item, template):
     print(len(template))
     while index < len(template):
         # Iteram prin cele 4 coordonate din KMap
-        for i in range(4):
+        for i in range(number_of_variables):
             if not condition:
-                result.append(k_map[(item[0] + template[index][0]) % 4][(item[1] + template[index][1]) % 4][i])
-            elif k_map[(item[0] + template[index][0]) % 4][(item[1] + template[index][1]) % 4][i] != result[i]:
+                result.append(k_map[(item[0] + template[index][0]) % 4][
+                                  (item[1] + template[index][1]) % 4][i])
+            elif k_map[(item[0] + template[index][0]) % 4][
+                (item[1] + template[index][1]) % 4][i] != \
+                    result[i]:
                 wrong_indexes.add(i)
         condition = 1
         index += 1
@@ -355,17 +339,19 @@ def minimization_result(k_map, item, template):
                     print("!C")
                 elif item == 1:
                     print("C")
-            if index == 3:
-                if item == 0:
-                    print("!D")
-                elif item == 1:
-                    print("D")
+            if number_of_variables == 4:
+                if index == 3:
+                    if item == 0:
+                        print("!D")
+                    elif item == 1:
+                        print("D")
 
 
-def add_to_verified(item, template):
+def add_to_verified(item, template, number_of_variables):
     verified = []
     for template_item in template:
-        verified.append([(item[0] + template_item[0]) % 4, (item[1] + template_item[1]) % 4])
+        verified.append(
+            [(item[0] + template_item[0]) % 4, (item[1] + template_item[1]) % 4])
     return verified
 
 
@@ -376,26 +362,35 @@ def find_list_in_list(small_list, big_list):
     return False
 
 
-def karnaugh_minimization_for_16(k_maps):
+def karnaugh_minimization_for_max(k_maps, number_of_variables):
     for row in k_maps:
         for index in row:
-            if index[4] == 0:
+            if index[number_of_variables] == 0:
                 return False
     return True
 
 
-def change_directional_array(maximum_size):
-    if maximum_size == 8:
-        return [[[0, 0], [0, 1], [1, 0], [1, 1], [2, 0], [2, 1], [3, 0], [3, 1]],
-                [[0, 0], [0, 1], [0, 2], [0, 3], [1, 0], [1, 1], [1, 2], [1, 3]]]
-    elif maximum_size == 4:
-        return [[[0, 0], [0, 1], [0, 2], [0, 3]],
-                [[0, 0], [1, 0], [2, 0], [3, 0]],
-                [[0, 0], [0, 1], [1, 0], [1, 1]]]
-    elif maximum_size == 2:
-        return [[[0, 0], [0, 1]], [[0, 0], [1, 0]]]
-    elif maximum_size == 1:
-        return [[[0, 0]]]
+def change_directional_array(maximum_size, number_of_variables):
+    if number_of_variables == 4:
+        if maximum_size == 8:
+            return [[[0, 0], [0, 1], [1, 0], [1, 1], [2, 0], [2, 1], [3, 0], [3, 1]],
+                    [[0, 0], [0, 1], [0, 2], [0, 3], [1, 0], [1, 1], [1, 2], [1, 3]]]
+        elif maximum_size == 4:
+            return [[[0, 0], [0, 1], [0, 2], [0, 3]],
+                    [[0, 0], [1, 0], [2, 0], [3, 0]],
+                    [[0, 0], [0, 1], [1, 0], [1, 1]]]
+        elif maximum_size == 2:
+            return [[[0, 0], [0, 1]], [[0, 0], [1, 0]]]
+        elif maximum_size == 1:
+            return [[[0, 0]]]
+    else:
+        if maximum_size == 4:
+            return [[[0, 0], [0, 1], [0, 2], [0, 3]],
+                    [[0, 0], [0, 1], [1, 0], [1, 1]]]
+        elif maximum_size == 2:
+            return [[[0, 0], [0, 1]], [[0, 0], [1, 0]]]
+        elif maximum_size == 1:
+            return [[[0, 0]]]
 
 
 def main():
