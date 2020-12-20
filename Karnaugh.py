@@ -242,7 +242,7 @@ def modify_karnaugh_map(truth_table, k_map, number_of_variables):
                         map_item[4] = table_item[4]
                         if table_item[4]:
                             queue.append([index_row, index_column])
-    # print_karnaugh_map(k_map, number_of_variables)
+    print_karnaugh_map(k_map, number_of_variables)
     karnaugh_minimization(k_map, number_of_variables, queue)
 
 
@@ -277,38 +277,57 @@ def karnaugh_minimization(k_map, number_of_variables, queue):
                     [3, 0], [3, 1], [3, 2], [3, 3]]
     # while maximum_size:
     print(queue)
+    to_print = []
     # In queue avem pozitiile din matrice etichetate cu 1 sau *
     while maximum_size:
         directional_array = change_directional_array(maximum_size, number_of_variables)
-        for item in queue:
-            for template in directional_array:
-                condition_zero = 1
-                condition_visited = 0
-                for direction in template:
-                    # verificam daca sunt doar valori de 1 sau * in KMap
-                    if k_map[(item[0] + direction[0]) % 4][(item[1] + direction[1]) % 4][number_of_variables] == 0:
-                        condition_zero = 0
-                    elif k_map[(item[0] + direction[0]) % 4][(item[1] + direction[1]) % 4][number_of_variables] == 1:
-                        # In cazul in care gasim un nod nevizitat
-                        if find_list_in_list([(item[0] + direction[0]) % 4,(item[1] + direction[1]) % 4],verified) == 0:
-                            condition_visited = 1
-                if condition_zero and condition_visited:
-                    minimization_result(k_map, item, template, number_of_variables)
-                    for aux in add_to_verified(item, template, number_of_variables):
-                        verified.append(aux)
-                    print("Verified: ", verified)
+        for verified_max in range(maximum_size, 0, -1):
+            for index in range(len(queue)):
+                for template in directional_array:
+                    condition_zero = 1
+                    condition_visited = 0
+                    number_visited = 0
+                    for direction in template:
+                        # verificam daca sunt doar valori de 1 sau * in KMap
+                        if k_map[(queue[index][0] + direction[0]) % 4][(queue[index][1] + direction[1]) % 4][
+                            number_of_variables] == 0:
+                            condition_zero = 0
+                        elif k_map[(queue[index][0] + direction[0]) % 4][(queue[index][1] + direction[1]) % 4][
+                            number_of_variables] == 1:
+                            # In cazul in care gasim un nod nevizitat
+                            if find_list_in_list(
+                                    [(queue[index][0] + direction[0]) % 4, (queue[index][1] + direction[1]) % 4],
+                                    verified) == 0:
+                                condition_visited = 1
+                                number_visited += 1
+                    if condition_zero and condition_visited and number_visited == verified_max:
+                        to_print.append(minimization_result(k_map, queue[index], template, number_of_variables))
+                        for aux in add_to_verified(queue[index], template):
+                            verified.append(aux)
+
         if maximum_size == 1:
             maximum_size = 0
-        maximum_size /= 2;
+
+        maximum_size = int(maximum_size/2)
+    print(to_print)
+    write_to_print(to_print)
+
+
+def write_to_print(to_print):
+    # Eliminam minimizarile facute in plus
+    for index, item in enumerate(to_print):
+        print(item, end="")
+        if index != len(to_print) - 1:
+            print(" + ", end="")
 
 
 def minimization_result(k_map, item, template, number_of_variables):
     index = 0
     result = []
     condition = 0
+    to_print = ""
     wrong_indexes = set()
     # Iteram prin fiecare directie din template-ul primit ca parametru
-    print(len(template))
     while index < len(template):
         # Iteram prin cele 4 coordonate din KMap
         for i in range(number_of_variables):
@@ -321,33 +340,33 @@ def minimization_result(k_map, item, template, number_of_variables):
                 wrong_indexes.add(i)
         condition = 1
         index += 1
-    print(result)
     for index, item in enumerate(result):
         if index not in wrong_indexes:
             if index == 0:
                 if item == 0:
-                    print("!A")
+                    to_print += "!A"
                 elif item == 1:
-                    print("A")
+                    to_print += "A"
             if index == 1:
                 if item == 0:
-                    print("!B")
+                    to_print += "!B"
                 elif item == 1:
-                    print("B")
+                    to_print += "B"
             if index == 2:
                 if item == 0:
-                    print("!C")
+                    to_print += "!C"
                 elif item == 1:
-                    print("C")
+                    to_print += "C"
             if number_of_variables == 4:
                 if index == 3:
                     if item == 0:
-                        print("!D")
+                        to_print += "!D"
                     elif item == 1:
-                        print("D")
+                        to_print += "D"
+    return to_print
 
 
-def add_to_verified(item, template, number_of_variables):
+def add_to_verified(item, template):
     verified = []
     for template_item in template:
         verified.append(
@@ -376,9 +395,9 @@ def change_directional_array(maximum_size, number_of_variables):
             return [[[0, 0], [0, 1], [1, 0], [1, 1], [2, 0], [2, 1], [3, 0], [3, 1]],
                     [[0, 0], [0, 1], [0, 2], [0, 3], [1, 0], [1, 1], [1, 2], [1, 3]]]
         elif maximum_size == 4:
-            return [[[0, 0], [0, 1], [0, 2], [0, 3]],
-                    [[0, 0], [1, 0], [2, 0], [3, 0]],
-                    [[0, 0], [0, 1], [1, 0], [1, 1]]]
+            return [[[0, 0], [0, 1], [1, 0], [1, 1]],
+                    [[0, 0], [0, 1], [0, 2], [0, 3]],
+                    [[0, 0], [1, 0], [2, 0], [3, 0]]]
         elif maximum_size == 2:
             return [[[0, 0], [0, 1]], [[0, 0], [1, 0]]]
         elif maximum_size == 1:
@@ -399,6 +418,7 @@ def main():
     truth_table = define_truth_table(number_of_variables)
     k_map = define_karnaugh_map(number_of_variables)
     if truth_table:
+        print("String template: sigma(x1,x2,...) /+ sigma*(y1,y2,...)")
         input_string = str(input())
         validate_string(input_string, truth_table, k_map, number_of_variables)
 
